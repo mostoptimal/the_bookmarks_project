@@ -1,0 +1,114 @@
+============================================================
+
+bookmarks_organizer/
+├── accounts/
+│   ├── __pycache__/
+│   │   ├── __init__.cpython-313.pyc (183.0 B)
+│   │   ├── admin.cpython-313.pyc (227.0 B)
+│   │   ├── apps.cpython-313.pyc (551.0 B)
+│   │   ├── models.cpython-313.pyc (224.0 B)
+│   │   ├── urls.cpython-313.pyc (369.0 B)
+│   │   └── views.cpython-313.pyc (437.0 B)
+│   ├── migrations/
+│   │   ├── __pycache__/
+│   │   │   └── __init__.cpython-313.pyc (194.0 B)
+│   │   └── __init__.py (0 B)
+│   ├── __init__.py (0 B)
+│   ├── admin.py (63.0 B)
+│   ├── apps.py (148.0 B)
+│   ├── models.py (57.0 B)
+│   ├── tests.py (60.0 B)
+│   ├── urls.py (136.0 B)
+│   └── views.py (167.0 B)
+├── bookmarks/
+│   ├── __pycache__/
+│   │   ├── __init__.cpython-313.pyc (184.0 B)
+│   │   ├── admin.cpython-313.pyc (228.0 B)
+│   │   ├── apps.cpython-313.pyc (554.0 B)
+│   │   ├── models.cpython-313.pyc (225.0 B)
+│   │   ├── urls.cpython-313.pyc (373.0 B)
+│   │   └── views.cpython-313.pyc (439.0 B)
+│   ├── migrations/
+│   │   ├── __pycache__/
+│   │   │   └── __init__.cpython-313.pyc (195.0 B)
+│   │   └── __init__.py (0 B)
+│   ├── __init__.py (0 B)
+│   ├── admin.py (63.0 B)
+│   ├── apps.py (150.0 B)
+│   ├── models.py (57.0 B)
+│   ├── tests.py (60.0 B)
+│   ├── urls.py (156.0 B)
+│   └── views.py (189.0 B)
+├── bookmarks_organizer/
+│   ├── __pycache__/
+│   │   ├── __init__.cpython-313.pyc (194.0 B)
+│   │   ├── settings.cpython-313.pyc (2.6 KB)
+│   │   ├── urls.cpython-313.pyc (1.2 KB)
+│   │   └── wsgi.cpython-313.pyc (706.0 B)
+│   ├── static/
+│   │   └── favico.ico (8.5 KB)
+│   ├── __init__.py (0 B)
+│   ├── asgi.py (415.0 B)
+│   ├── settings.py (3.5 KB)
+│   ├── urls.py (999.0 B)
+│   └── wsgi.py (415.0 B)
+├── dashboard/
+│   ├── __pycache__/
+│   │   ├── __init__.cpython-313.pyc (184.0 B)
+│   │   ├── admin.cpython-313.pyc (228.0 B)
+│   │   ├── apps.cpython-313.pyc (554.0 B)
+│   │   ├── models.cpython-313.pyc (225.0 B)
+│   │   ├── urls.cpython-313.pyc (372.0 B)
+│   │   └── views.cpython-313.pyc (395.0 B)
+│   ├── migrations/
+│   │   ├── __pycache__/
+│   │   │   └── __init__.cpython-313.pyc (195.0 B)
+│   │   └── __init__.py (0 B)
+│   ├── templates/
+│   │   └── dashboard/
+│   │       ├── index.html (31.7 KB)
+│   │       ├── index.v1.html (570.0 B)
+│   │       ├── index.v2.html (22.4 KB)
+│   │       ├── index.v3.html (21.5 KB)
+│   │       └── prompt_dashboard.md (3.3 KB)
+│   ├── __init__.py (0 B)
+│   ├── admin.py (63.0 B)
+│   ├── apps.py (150.0 B)
+│   ├── models.py (57.0 B)
+│   ├── tests.py (60.0 B)
+│   ├── urls.py (415.0 B)
+│   └── views.py (166.0 B)
+├── landing/
+│   ├── __pycache__/
+│   │   ├── __init__.cpython-313.pyc (182.0 B)
+│   │   ├── admin.cpython-313.pyc (226.0 B)
+│   │   ├── apps.cpython-313.pyc (548.0 B)
+│   │   ├── models.cpython-313.pyc (223.0 B)
+│   │   ├── urls.cpython-313.pyc (367.0 B)
+│   │   └── views.cpython-313.pyc (389.0 B)
+│   ├── migrations/
+│   │   ├── __pycache__/
+│   │   │   └── __init__.cpython-313.pyc (193.0 B)
+│   │   └── __init__.py (0 B)
+│   ├── static/
+│   │   ├── css/
+│   │   ├── images/
+│   │   │   └── favico.ico (8.5 KB)
+│   │   ├── js/
+│   │   └── landing/
+│   ├── templates/
+│   │   └── landing/
+│   │       └── index.html (1.4 KB)
+│   ├── __init__.py (0 B)
+│   ├── admin.py (63.0 B)
+│   ├── apps.py (146.0 B)
+│   ├── models.py (57.0 B)
+│   ├── tests.py (60.0 B)
+│   ├── urls.py (183.0 B)
+│   └── views.py (106.0 B)
+├── bookmark_manager_structure.txt (0 B)
+├── db.sqlite3 (204.0 KB)
+├── manage.py (675.0 B)
+└── scan.py (4.8 KB)
+
+============================================================

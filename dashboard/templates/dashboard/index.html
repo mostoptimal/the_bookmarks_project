@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bookmark Manager</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --primary: #bb86fc;
+        --primary-variant: #3700b3;
+        --secondary: #03dac6;
+        --background: #121212;
+        --surface: #1e1e1e;
+        --surface-variant: #2d2d2d;
+        --on-primary: #000000;
+        --on-secondary: #000000;
+        --on-background: #ffffff;
+        --on-surface: #ffffff;
+        --on-surface-variant: #e0e0e0;
+        --outline: #737373;
+        --error: #cf6679;
+        --shadow: rgba(0, 0, 0, 0.5);
+      }
+
+      body {
+        font-family: "Roboto", sans-serif;
+        background-color: var(--background);
+        color: var(--on-background);
+        line-height: 1.5;
+        overflow-x: hidden;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px;
+      }
+
+      .header {
+        background: var(--surface);
+        padding: 24px;
+        border-radius: 16px;
+        margin-bottom: 24px;
+        box-shadow: 0 4px 12px var(--shadow);
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        font-weight: 300;
+        margin-bottom: 8px;
+        color: var(--primary);
+      }
+
+      .header p {
+        color: var(--on-surface-variant);
+        font-size: 1.1rem;
+      }
+
+      .input-methods {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        margin-bottom: 24px;
+      }
+
+      .upload-section,
+      .add-url-section {
+        background: var(--surface);
+        border-radius: 16px;
+        padding: 32px;
+        box-shadow: 0 2px 8px var(--shadow);
+      }
+
+      .section-title {
+        font-size: 1.2rem;
+        font-weight: 500;
+        margin-bottom: 16px;
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .upload-area {
+        border: 2px dashed var(--outline);
+        border-radius: 12px;
+        padding: 32px 24px;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+      }
+
+      .upload-area:hover {
+        border-color: var(--primary);
+        background: rgba(187, 134, 252, 0.08);
+      }
+
+      .upload-area.dragover {
+        border-color: var(--secondary);
+        background: rgba(3, 218, 198, 0.1);
+        transform: scale(1.02);
+      }
+
+      .upload-icon {
+        font-size: 3rem;
+        color: var(--primary);
+        margin-bottom: 12px;
+      }
+
+      .upload-text {
+        font-size: 1rem;
+        margin-bottom: 8px;
+      }
+
+      .upload-subtext {
+        color: var(--on-surface-variant);
+        font-size: 0.8rem;
+      }
+
+      .file-input {
+        display: none;
+      }
+
+      .url-form {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .form-label {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--on-surface);
+      }
+
+      .form-input {
+        background: var(--surface-variant);
+        border: 1px solid var(--outline);
+        border-radius: 8px;
+        padding: 12px 16px;
+        color: var(--on-surface);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+      }
+
+      .form-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(187, 134, 252, 0.3);
+      }
+
+      .form-input::placeholder {
+        color: var(--on-surface-variant);
+      }
+
+      .select-input {
+        background: var(--surface-variant);
+        border: 1px solid var(--outline);
+        border-radius: 8px;
+        padding: 12px 16px;
+        color: var(--on-surface);
+        font-size: 1rem;
+        cursor: pointer;
+      }
+
+      .btn {
+        background: var(--primary);
+        color: var(--on-primary);
+        border: none;
+        padding: 12px 24px;
+        border-radius: 24px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .btn:hover {
+        background: #c49bff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(187, 134, 252, 0.4);
+      }
+
+      .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .btn-secondary {
+        background: var(--surface-variant);
+        color: var(--on-surface);
+      }
+
+      .btn-secondary:hover {
+        background: #404040;
+      }
+
+      .stats-bar {
+        background: var(--surface);
+        padding: 16px 24px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        box-shadow: 0 2px 8px var(--shadow);
+      }
+
+      .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .stat-number {
+        font-size: 1.5rem;
+        font-weight: 500;
+        color: var(--secondary);
+      }
+
+      .controls {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .search-box {
+        background: var(--surface-variant);
+        border: 1px solid var(--outline);
+        border-radius: 24px;
+        padding: 12px 16px;
+        color: var(--on-surface);
+        font-size: 1rem;
+        width: 300px;
+        transition: all 0.3s ease;
+      }
+
+      .search-box:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(187, 134, 252, 0.3);
+      }
+
+      .bookmarks-container {
+        background: var(--surface);
+        border-radius: 16px;
+        box-shadow: 0 2px 8px var(--shadow);
+        overflow: hidden;
+      }
+
+      .virtual-list {
+        height: 600px;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: var(--outline) var(--surface);
+      }
+
+      .virtual-list::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .virtual-list::-webkit-scrollbar-track {
+        background: var(--surface);
+      }
+
+      .virtual-list::-webkit-scrollbar-thumb {
+        background: var(--outline);
+        border-radius: 4px;
+      }
+
+      .virtual-list::-webkit-scrollbar-thumb:hover {
+        background: var(--primary);
+      }
+
+      .bookmark-item {
+        display: flex;
+        align-items: center;
+        padding: 16px 24px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.2s ease;
+        cursor: pointer;
+      }
+
+      .bookmark-item:hover {
+        background: rgba(187, 134, 252, 0.08);
+      }
+
+      .bookmark-item:last-child {
+        border-bottom: none;
+      }
+
+      .bookmark-favicon {
+        width: 24px;
+        height: 24px;
+        margin-right: 16px;
+        border-radius: 4px;
+        background: var(--surface-variant);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--on-surface-variant);
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+
+      .bookmark-content {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .bookmark-title {
+        font-weight: 500;
+        margin-bottom: 4px;
+        color: var(--on-surface);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .bookmark-url {
+        color: var(--on-surface-variant);
+        font-size: 0.9rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .bookmark-folder {
+        background: var(--primary-variant);
+        color: var(--on-primary);
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        margin-left: 12px;
+        white-space: nowrap;
+      }
+
+      .loading {
+        text-align: center;
+        padding: 48px;
+        color: var(--on-surface-variant);
+      }
+
+      .spinner {
+        border: 3px solid var(--surface-variant);
+        border-top: 3px solid var(--primary);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 16px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .error-message,
+      .success-message {
+        padding: 16px;
+        border-radius: 8px;
+        margin: 16px 0;
+        font-weight: 500;
+      }
+
+      .error-message {
+        background: rgba(207, 102, 121, 0.1);
+        border: 1px solid var(--error);
+        color: var(--error);
+      }
+
+      .success-message {
+        background: rgba(3, 218, 198, 0.1);
+        border: 1px solid var(--secondary);
+        color: var(--secondary);
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 64px 24px;
+        color: var(--on-surface-variant);
+      }
+
+      .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 16px;
+        opacity: 0.5;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 16px;
+        }
+
+        .header h1 {
+          font-size: 2rem;
+        }
+
+        .input-methods {
+          grid-template-columns: 1fr;
+        }
+
+        .search-box {
+          width: 100%;
+        }
+
+        .controls {
+          width: 100%;
+        }
+
+        .stats-bar {
+          flex-direction: column;
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>
+          <span
+            class="material-icons"
+            style="font-size: inherit; vertical-align: bottom"
+            >bookmarks</span
+          >
+          Bookmark Manager
+        </h1>
+        <p>Upload bookmark files or add individual bookmarks</p>
+      </div>
+
+      <div class="input-methods">
+        <!-- File Upload Section -->
+        <div class="upload-section">
+          <div class="section-title">
+            <span class="material-icons">cloud_upload</span>
+            Upload Bookmark Files
+          </div>
+          <div class="upload-area" id="uploadArea">
+            <div class="material-icons upload-icon">upload_file</div>
+            <div class="upload-text">Drop files here or click to browse</div>
+            <div class="upload-subtext">
+              HTML and JSON bookmark files up to 10MB
+            </div>
+            <input
+              type="file"
+              class="file-input"
+              id="fileInput"
+              accept=".html,.json"
+              multiple
+            />
+          </div>
+        </div>
+
+        <!-- Add Single URL Section -->
+        <div class="add-url-section">
+          <div class="section-title">
+            <span class="material-icons">add_link</span>
+            Add Single Bookmark
+          </div>
+          <form class="url-form" id="urlForm">
+            <div class="form-group">
+              <label class="form-label" for="urlInput">URL *</label>
+              <input
+                type="url"
+                id="urlInput"
+                class="form-input"
+                placeholder="https://example.com"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="titleInput">Title</label>
+              <input
+                type="text"
+                id="titleInput"
+                class="form-input"
+                placeholder="Bookmark title (auto-detected if empty)"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="folderSelect">Folder</label>
+              <select id="folderSelect" class="select-input">
+                <option value="">Root</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="descriptionInput"
+                >Description</label
+              >
+              <input
+                type="text"
+                id="descriptionInput"
+                class="form-input"
+                placeholder="Optional description"
+              />
+            </div>
+            <button type="submit" class="btn" id="addBookmarkBtn">
+              <span class="material-icons">add</span>
+              Add Bookmark
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="stats-bar" id="statsBar" style="display: none">
+        <div style="display: flex; gap: 24px; flex-wrap: wrap">
+          <div class="stat-item">
+            <span class="material-icons">bookmark</span>
+            <span class="stat-number" id="totalBookmarks">0</span>
+            <span>Bookmarks</span>
+          </div>
+          <div class="stat-item">
+            <span class="material-icons">folder</span>
+            <span class="stat-number" id="totalFolders">0</span>
+            <span>Folders</span>
+          </div>
+        </div>
+        <div class="controls">
+          <input
+            type="text"
+            class="search-box"
+            id="searchBox"
+            placeholder="Search bookmarks..."
+          />
+          <button class="btn btn-secondary" id="clearBtn">
+            <span class="material-icons">clear</span>
+            Clear All
+          </button>
+        </div>
+      </div>
+
+      <div
+        class="bookmarks-container"
+        id="bookmarksContainer"
+        style="display: none"
+      >
+        <div class="virtual-list" id="virtualList"></div>
+      </div>
+    </div>
+
+    <script>
+      class BookmarkManager {
+        constructor() {
+          this.bookmarks = [];
+          this.filteredBookmarks = [];
+          this.folders = new Set(["Root"]);
+          this.itemHeight = 72;
+          this.visibleItems = Math.ceil(600 / this.itemHeight) + 2;
+          this.scrollTop = 0;
+
+          this.initializeElements();
+          this.bindEvents();
+          this.loadExistingBookmarks();
+        }
+
+        initializeElements() {
+          this.uploadArea = document.getElementById("uploadArea");
+          this.fileInput = document.getElementById("fileInput");
+          this.urlForm = document.getElementById("urlForm");
+          this.urlInput = document.getElementById("urlInput");
+          this.titleInput = document.getElementById("titleInput");
+          this.folderSelect = document.getElementById("folderSelect");
+          this.descriptionInput = document.getElementById("descriptionInput");
+          this.addBookmarkBtn = document.getElementById("addBookmarkBtn");
+          this.statsBar = document.getElementById("statsBar");
+          this.bookmarksContainer =
+            document.getElementById("bookmarksContainer");
+          this.virtualList = document.getElementById("virtualList");
+          this.searchBox = document.getElementById("searchBox");
+          this.clearBtn = document.getElementById("clearBtn");
+          this.totalBookmarks = document.getElementById("totalBookmarks");
+          this.totalFolders = document.getElementById("totalFolders");
+        }
+
+        bindEvents() {
+          // Upload area events
+          this.uploadArea.addEventListener("click", () =>
+            this.fileInput.click()
+          );
+          this.uploadArea.addEventListener(
+            "dragover",
+            this.handleDragOver.bind(this)
+          );
+          this.uploadArea.addEventListener(
+            "dragleave",
+            this.handleDragLeave.bind(this)
+          );
+          this.uploadArea.addEventListener("drop", this.handleDrop.bind(this));
+
+          // File input
+          this.fileInput.addEventListener(
+            "change",
+            this.handleFileSelect.bind(this)
+          );
+
+          // URL form
+          this.urlForm.addEventListener(
+            "submit",
+            this.handleAddBookmark.bind(this)
+          );
+          this.urlInput.addEventListener(
+            "blur",
+            this.autoFetchTitle.bind(this)
+          );
+
+          // Search
+          this.searchBox.addEventListener(
+            "input",
+            this.handleSearch.bind(this)
+          );
+
+          // Clear button
+          this.clearBtn.addEventListener(
+            "click",
+            this.clearBookmarks.bind(this)
+          );
+
+          // Virtual scrolling
+          this.virtualList.addEventListener(
+            "scroll",
+            this.handleScroll.bind(this)
+          );
+        }
+
+        async loadExistingBookmarks() {
+          try {
+            const response = await fetch("/bookmarks/api/bookmarks/");
+            if (response.ok) {
+              const data = await response.json();
+              this.bookmarks = data.bookmarks || [];
+              this.filteredBookmarks = [...this.bookmarks];
+              this.updateFolders();
+              this.updateStats();
+              this.renderBookmarks();
+            }
+          } catch (error) {
+            console.error("Failed to load existing bookmarks:", error);
+          }
+        }
+
+        async handleAddBookmark(e) {
+          e.preventDefault();
+
+          const url = this.urlInput.value.trim();
+          const title = this.titleInput.value.trim();
+          const folder = this.folderSelect.value;
+          const description = this.descriptionInput.value.trim();
+
+          if (!url) {
+            this.showMessage("Please enter a URL", "error");
+            return;
+          }
+
+          this.addBookmarkBtn.disabled = true;
+          this.addBookmarkBtn.innerHTML =
+            '<span class="spinner" style="width: 16px; height: 16px; border-width: 2px; margin: 0 8px 0 0;"></span>Adding...';
+
+          try {
+            const bookmarkData = {
+              url: url,
+              title: title || (await this.fetchPageTitle(url)),
+              folder: folder || "Root",
+              description: description,
+              favicon: this.getFaviconUrl(url),
+            };
+
+            // Save to backend
+            await this.saveToDatabase([bookmarkData]);
+
+            // Add to frontend
+            this.addBookmarks([bookmarkData]);
+            this.updateStats();
+            this.renderBookmarks();
+
+            // Clear form
+            this.urlForm.reset();
+            this.showMessage("Bookmark added successfully!", "success");
+          } catch (error) {
+            this.showMessage(
+              "Failed to add bookmark: " + error.message,
+              "error"
+            );
+          } finally {
+            this.addBookmarkBtn.disabled = false;
+            this.addBookmarkBtn.innerHTML =
+              '<span class="material-icons">add</span>Add Bookmark';
+          }
+        }
+
+        async autoFetchTitle() {
+          const url = this.urlInput.value.trim();
+          if (url && !this.titleInput.value.trim()) {
+            try {
+              const title = await this.fetchPageTitle(url);
+              this.titleInput.value = title;
+            } catch (error) {
+              console.log("Could not fetch page title");
+            }
+          }
+        }
+
+        async fetchPageTitle(url) {
+          try {
+            // This would need a backend endpoint to fetch page title due to CORS
+            // For now, extract domain as fallback
+            const domain = new URL(url).hostname;
+            return domain.replace("www.", "");
+          } catch {
+            return "Untitled";
+          }
+        }
+
+        updateFolders() {
+          this.folders.clear();
+          this.folders.add("Root");
+
+          this.bookmarks.forEach((bookmark) => {
+            if (bookmark.folder) {
+              this.folders.add(bookmark.folder);
+            }
+          });
+
+          // Update folder select
+          const currentValue = this.folderSelect.value;
+          this.folderSelect.innerHTML = '<option value="">Root</option>';
+
+          Array.from(this.folders)
+            .filter((f) => f !== "Root")
+            .forEach((folder) => {
+              const option = document.createElement("option");
+              option.value = folder;
+              option.textContent = folder;
+              this.folderSelect.appendChild(option);
+            });
+
+          this.folderSelect.value = currentValue;
+        }
+
+        async saveToDatabase(bookmarks) {
+          try {
+            const response = await fetch("/bookmarks/upload/", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ bookmarks: bookmarks }),
+            });
+
+            const result = await response.json();
+
+            if (!result.success) {
+              throw new Error(result.error);
+            }
+
+            return result;
+          } catch (error) {
+            console.error("Save error:", error);
+            throw error;
+          }
+        }
+
+        showMessage(message, type = "success") {
+          const messageDiv = document.createElement("div");
+          messageDiv.className = `${type}-message`;
+          messageDiv.textContent = message;
+
+          // Insert after input methods
+          const inputMethods = document.querySelector(".input-methods");
+          inputMethods.after(messageDiv);
+
+          setTimeout(() => {
+            messageDiv.remove();
+          }, 5000);
+        }
+
+        handleDragOver(e) {
+          e.preventDefault();
+          this.uploadArea.classList.add("dragover");
+        }
+
+        handleDragLeave(e) {
+          if (!this.uploadArea.contains(e.relatedTarget)) {
+            this.uploadArea.classList.remove("dragover");
+          }
+        }
+
+        handleDrop(e) {
+          e.preventDefault();
+          this.uploadArea.classList.remove("dragover");
+          const files = Array.from(e.dataTransfer.files);
+          this.processFiles(files);
+        }
+
+        handleFileSelect(e) {
+          const files = Array.from(e.target.files);
+          this.processFiles(files);
+        }
+
+        async processFiles(files) {
+          this.showLoading();
+
+          try {
+            const allBookmarks = [];
+
+            for (const file of files) {
+              if (file.size > 10 * 1024 * 1024) {
+                throw new Error(`File ${file.name} is too large (max 10MB)`);
+              }
+
+              const content = await this.readFile(file);
+              const bookmarks = await this.parseBookmarkFile(
+                content,
+                file.name
+              );
+              allBookmarks.push(...bookmarks);
+            }
+
+            // Save to backend
+            await this.saveToDatabase(allBookmarks);
+
+            this.addBookmarks(allBookmarks);
+            this.updateStats();
+            this.renderBookmarks();
+            this.showMessage(
+              `Successfully imported ${allBookmarks.length} bookmarks!`,
+              "success"
+            );
+          } catch (error) {
+            this.showError(error.message);
+          } finally {
+            this.hideLoading();
+          }
+        }
+
+        readFile(file) {
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.onerror = () => reject(new Error("Failed to read file"));
+            reader.readAsText(file);
+          });
+        }
+
+        async parseBookmarkFile(content, filename) {
+          const extension = filename.toLowerCase().split(".").pop();
+
+          if (extension === "json") {
+            return this.parseJsonBookmarks(content);
+          } else if (extension === "html") {
+            return this.parseHtmlBookmarks(content);
+          } else {
+            throw new Error("Unsupported file format");
+          }
+        }
+
+        parseJsonBookmarks(content) {
+          try {
+            const data = JSON.parse(content);
+            return this.extractBookmarksFromJson(data);
+          } catch (error) {
+            throw new Error("Invalid JSON format");
+          }
+        }
+
+        parseHtmlBookmarks(content) {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(content, "text/html");
+          return this.extractBookmarksFromHtml(doc);
+        }
+
+        extractBookmarksFromJson(data, folder = "Root") {
+          const bookmarks = [];
+
+          const traverse = (node, currentFolder) => {
+            if (Array.isArray(node)) {
+              node.forEach((item) => traverse(item, currentFolder));
+            } else if (typeof node === "object") {
+              if (node.type === "url" || node.url) {
+                bookmarks.push({
+                  title: node.title || node.name || "Untitled",
+                  url: node.url,
+                  folder: currentFolder,
+                  favicon: this.getFaviconUrl(node.url),
+                });
+              } else if (node.children || node.type === "folder") {
+                const folderName = node.title || node.name || "Untitled Folder";
+                if (node.children) {
+                  traverse(node.children, folderName);
+                }
+              } else {
+                Object.values(node).forEach((value) => {
+                  if (typeof value === "object") {
+                    traverse(value, currentFolder);
+                  }
+                });
+              }
+            }
+          };
+
+          traverse(data, folder);
+          return bookmarks;
+        }
+
+        extractBookmarksFromHtml(doc, folder = "Root") {
+          const bookmarks = [];
+
+          const traverse = (element, currentFolder) => {
+            const links = element.querySelectorAll("a[href]");
+            links.forEach((link) => {
+              bookmarks.push({
+                title: link.textContent.trim() || "Untitled",
+                url: link.href,
+                folder: currentFolder,
+                favicon: this.getFaviconUrl(link.href),
+              });
+            });
+
+            const folders = element.querySelectorAll("h3, dt");
+            folders.forEach((folderElement) => {
+              const folderName =
+                folderElement.textContent.trim() || "Untitled Folder";
+              const nextElement = folderElement.nextElementSibling;
+              if (
+                nextElement &&
+                (nextElement.tagName === "DL" || nextElement.tagName === "UL")
+              ) {
+                traverse(nextElement, folderName);
+              }
+            });
+          };
+
+          traverse(doc.body || doc, folder);
+          return bookmarks;
+        }
+
+        getFaviconUrl(url) {
+          try {
+            const domain = new URL(url).hostname;
+            return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+          } catch {
+            return null;
+          }
+        }
+
+        addBookmarks(newBookmarks) {
+          this.bookmarks.push(...newBookmarks);
+          this.filteredBookmarks = [...this.bookmarks];
+          this.updateFolders();
+        }
+
+        updateStats() {
+          const folders = [...new Set(this.bookmarks.map((b) => b.folder))];
+          this.totalBookmarks.textContent =
+            this.bookmarks.length.toLocaleString();
+          this.totalFolders.textContent = folders.length.toLocaleString();
+
+          this.statsBar.style.display =
+            this.bookmarks.length > 0 ? "flex" : "none";
+          this.bookmarksContainer.style.display =
+            this.bookmarks.length > 0 ? "block" : "none";
+        }
+
+        handleSearch(e) {
+          const query = e.target.value.toLowerCase().trim();
+
+          if (query === "") {
+            this.filteredBookmarks = [...this.bookmarks];
+          } else {
+            this.filteredBookmarks = this.bookmarks.filter(
+              (bookmark) =>
+                bookmark.title.toLowerCase().includes(query) ||
+                bookmark.url.toLowerCase().includes(query) ||
+                bookmark.folder.toLowerCase().includes(query)
+            );
+          }
+
+          this.scrollTop = 0;
+          this.virtualList.scrollTop = 0;
+          this.renderBookmarks();
+        }
+
+        handleScroll() {
+          this.scrollTop = this.virtualList.scrollTop;
+          this.renderBookmarks();
+        }
+
+        renderBookmarks() {
+          if (this.filteredBookmarks.length === 0) {
+            this.showEmptyState();
+            return;
+          }
+
+          const startIndex = Math.floor(this.scrollTop / this.itemHeight);
+          const endIndex = Math.min(
+            startIndex + this.visibleItems,
+            this.filteredBookmarks.length
+          );
+
+          const containerHeight =
+            this.filteredBookmarks.length * this.itemHeight;
+          const offsetY = startIndex * this.itemHeight;
+
+          let html = `<div style="height: ${containerHeight}px; position: relative;">`;
+          html += `<div style="transform: translateY(${offsetY}px);">`;
+
+          for (let i = startIndex; i < endIndex; i++) {
+            const bookmark = this.filteredBookmarks[i];
+            html += this.renderBookmarkItem(bookmark);
+          }
+
+          html += "</div></div>";
+          this.virtualList.innerHTML = html;
+        }
+
+        renderBookmarkItem(bookmark) {
+          const favicon = bookmark.favicon
+            ? `<img src="${bookmark.favicon}" alt="" style="width: 16px; height: 16px;" onerror="this.style.display='none'">`
+            : '<span class="material-icons" style="font-size: 16px;">public</span>';
+
+          return `
+                    <div class="bookmark-item" onclick="window.open('${this.escapeHtml(
+                      bookmark.url
+                    )}', '_blank')">
+                        <div class="bookmark-favicon">${favicon}</div>
+                        <div class="bookmark-content">
+                            <div class="bookmark-title">${this.escapeHtml(
+                              bookmark.title
+                            )}</div>
+                            <div class="bookmark-url">${this.escapeHtml(
+                              bookmark.url
+                            )}</div>
+                        </div>
+                        <div class="bookmark-folder">${this.escapeHtml(
+                          bookmark.folder
+                        )}</div>
+                    </div>
+                `;
+        }
+
+        escapeHtml(text) {
+          const div = document.createElement("div");
+          div.textContent = text;
+          return div.innerHTML;
+        }
+
+        clearBookmarks() {
+          this.bookmarks = [];
+          this.filteredBookmarks = [];
+          this.searchBox.value = "";
+          this.updateStats();
+          this.virtualList.innerHTML = "";
+        }
+
+        showLoading() {
+          this.virtualList.innerHTML = `
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <div>Processing bookmark files...</div>
+                    </div>
+                `;
+          this.bookmarksContainer.style.display = "block";
+        }
+
+        hideLoading() {
+          // Loading will be replaced by actual content or empty state
+        }
+
+        showError(message) {
+          this.virtualList.innerHTML = `
+                    <div class="error-message">
+                        <strong>Error:</strong> ${this.escapeHtml(message)}
+                    </div>
+                `;
+        }
+
+        showEmptyState() {
+          this.virtualList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="material-icons empty-icon">bookmark_border</div>
+                        <div>No bookmarks found</div>
+                        <div style="margin-top: 8px; opacity: 0.7;">Upload bookmark files to get started</div>
+                    </div>
+                `;
+        }
+
+        async saveToDatabase(bookmarks) {
+          try {
+            const response = await fetch("/bookmarks/upload/", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ bookmarks: bookmarks }),
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+              alert(result.message);
+            } else {
+              throw new Error(result.error);
+            }
+          } catch (error) {
+            console.error("Save error:", error);
+            alert("Failed to save bookmarks: " + error.message);
+          }
+        }
+      }
+
+      // Initialize the bookmark manager
+      document.addEventListener("DOMContentLoaded", () => {
+        new BookmarkManager();
+      });
+    </script>
+  </body>
+</html>

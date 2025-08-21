@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bookmark Manager</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #121212;
+        color: #e0e0e0;
+        font-family: "Roboto", sans-serif;
+      }
+      .navbar-dark {
+        background-color: #1e1e1e !important;
+      }
+      .bg-dark-custom {
+        background-color: #1e1e1e !important;
+      }
+      .bg-darker {
+        background-color: #2d2d2d !important;
+      }
+      .text-primary-custom {
+        color: #bb86fc !important;
+      }
+      .text-secondary-custom {
+        color: #03dac6 !important;
+      }
+      .btn-primary-custom {
+        background-color: #bb86fc;
+        border-color: #bb86fc;
+        color: #000;
+      }
+      .btn-primary-custom:hover {
+        background-color: #c49bff;
+        border-color: #c49bff;
+        color: #000;
+      }
+      .form-control-dark {
+        background-color: #2d2d2d;
+        border-color: #737373;
+        color: #e0e0e0;
+      }
+      .form-control-dark:focus {
+        background-color: #2d2d2d;
+        border-color: #bb86fc;
+        color: #e0e0e0;
+        box-shadow: 0 0 0 0.25rem rgba(187, 134, 252, 0.25);
+      }
+      .virtual-scroll {
+        height: 70vh;
+        overflow-y: auto;
+      }
+      .bookmark-item {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        cursor: pointer;
+      }
+      .bookmark-item:hover {
+        background-color: rgba(187, 134, 252, 0.1) !important;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Back Button (Floating) -->
+    <div class="position-fixed top-0 start-0 m-3" style="z-index: 1050">
+      <a href="{% url 'landing-home' %}" class="btn btn-primary-custom">
+        <span class="material-icons me-1" style="font-size: 18px"
+          >arrow_back</span
+        >
+        Dashboard
+      </a>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark bg-dark-custom shadow-sm">
+      <div class="container-fluid">
+        <div class="navbar-brand d-flex align-items-center">
+          <span
+            class="material-icons text-primary-custom me-2"
+            style="font-size: 2rem"
+            >bookmarks</span
+          >
+          <span class="h4 mb-0 text-primary-custom">Bookmark Manager</span>
+        </div>
+        <div
+          class="d-flex align-items-center gap-3"
+          id="statsDisplay"
+          style="display: none !important"
+        >
+          <div class="d-flex align-items-center gap-2">
+            <span class="material-icons">bookmark</span>
+            <span class="fw-bold text-secondary-custom" id="totalBookmarks"
+              >0</span
+            >
+            <small>Bookmarks</small>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="material-icons">folder</span>
+            <span class="fw-bold text-secondary-custom" id="totalFolders"
+              >0</span
+            >
+            <small>Folders</small>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container mt-4">
+      <!-- Input Form -->
+      <div class="card bg-dark-custom border-secondary mb-4">
+        <div class="card-header">
+          <h5 class="mb-0 text-primary-custom">Add Bookmarks</h5>
+        </div>
+        <div class="card-body">
+          <form id="bookmarkForm">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="urlInput" class="form-label">URL</label>
+                <input
+                  type="url"
+                  class="form-control form-control-dark"
+                  id="urlInput"
+                  placeholder="https://example.com"
+                />
+                <div class="form-text text-muted">
+                  Add a single bookmark by URL
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label for="fileInput" class="form-label">Bookmark File</label>
+                <input
+                  type="file"
+                  class="form-control form-control-dark"
+                  id="fileInput"
+                  accept=".html,.json"
+                  multiple
+                />
+                <div class="form-text text-muted">
+                  Upload HTML or JSON bookmark files (max 10MB)
+                </div>
+              </div>
+            </div>
+            <div class="row g-3 mt-2">
+              <div class="col-md-6">
+                <input
+                  type="text"
+                  class="form-control form-control-dark"
+                  id="titleInput"
+                  placeholder="Bookmark title (optional)"
+                />
+              </div>
+              <div class="col-md-6">
+                <input
+                  type="text"
+                  class="form-control form-control-dark"
+                  id="folderInput"
+                  placeholder="Folder name (optional)"
+                  value="Manual"
+                />
+              </div>
+            </div>
+            <div class="mt-3 d-flex gap-2">
+              <button type="submit" class="btn btn-primary-custom">
+                <span class="material-icons me-1" style="font-size: 18px"
+                  >add</span
+                >
+                Add Bookmark
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                id="clearBtn"
+              >
+                <span class="material-icons me-1" style="font-size: 18px"
+                  >clear</span
+                >
+                Clear All
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Search Bar -->
+      <div
+        class="card bg-dark-custom border-secondary mb-4"
+        id="searchCard"
+        style="display: none"
+      >
+        <div class="card-body py-3">
+          <div class="input-group">
+            <span class="input-group-text bg-darker border-secondary">
+              <span class="material-icons">search</span>
+            </span>
+            <input
+              type="text"
+              class="form-control form-control-dark border-secondary"
+              id="searchBox"
+              placeholder="Search bookmarks..."
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Bookmarks Container -->
+      <div
+        class="card bg-dark-custom border-secondary"
+        id="bookmarksContainer"
+        style="display: none"
+      >
+        <div class="card-body p-0">
+          <div class="virtual-scroll" id="virtualList"></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      class BookmarkManager {
+        constructor() {
+          this.bookmarks = [];
+          this.filteredBookmarks = [];
+          this.itemHeight = 80;
+          this.visibleItems =
+            Math.ceil((window.innerHeight * 0.7) / this.itemHeight) + 2;
+          this.scrollTop = 0;
+
+          this.initializeElements();
+          this.bindEvents();
+
+          window.addEventListener("resize", () => {
+            this.visibleItems =
+              Math.ceil((window.innerHeight * 0.7) / this.itemHeight) + 2;
+            if (this.filteredBookmarks.length > 0) {
+              this.renderBookmarks();
+            }
+          });
+        }
+
+        initializeElements() {
+          this.bookmarkForm = document.getElementById("bookmarkForm");
+          this.urlInput = document.getElementById("urlInput");
+          this.titleInput = document.getElementById("titleInput");
+          this.folderInput = document.getElementById("folderInput");
+          this.fileInput = document.getElementById("fileInput");
+          this.statsDisplay = document.getElementById("statsDisplay");
+          this.searchCard = document.getElementById("searchCard");
+          this.bookmarksContainer =
+            document.getElementById("bookmarksContainer");
+          this.virtualList = document.getElementById("virtualList");
+          this.searchBox = document.getElementById("searchBox");
+          this.clearBtn = document.getElementById("clearBtn");
+          this.totalBookmarks = document.getElementById("totalBookmarks");
+          this.totalFolders = document.getElementById("totalFolders");
+        }
+
+        bindEvents() {
+          // Form submission
+          this.bookmarkForm.addEventListener(
+            "submit",
+            this.handleFormSubmit.bind(this)
+          );
+
+          // File input
+          this.fileInput.addEventListener(
+            "change",
+            this.handleFileSelect.bind(this)
+          );
+
+          // Search
+          this.searchBox.addEventListener(
+            "input",
+            this.handleSearch.bind(this)
+          );
+
+          // Clear button
+          this.clearBtn.addEventListener(
+            "click",
+            this.clearBookmarks.bind(this)
+          );
+
+          // Virtual scrolling
+          this.virtualList.addEventListener(
+            "scroll",
+            this.handleScroll.bind(this)
+          );
+        }
+
+        async handleFormSubmit(e) {
+          e.preventDefault();
+
+          const url = this.urlInput.value.trim();
+          const title = this.titleInput.value.trim();
+          const folder = this.folderInput.value.trim() || "Manual";
+
+          if (url) {
+            try {
+              new URL(url); // Validate URL
+              const bookmark = {
+                title: title || this.extractTitleFromUrl(url),
+                url: url,
+                folder: folder,
+                favicon: this.getFaviconUrl(url),
+              };
+
+              this.addBookmarks([bookmark]);
+              this.updateStats();
+              this.renderBookmarks();
+
+              // Reset form
+              this.urlInput.value = "";
+              this.titleInput.value = "";
+              this.folderInput.value = "Manual";
+
+              this.showSuccess("Bookmark added successfully!");
+            } catch (error) {
+              this.showError("Please enter a valid URL");
+            }
+          }
+        }
+
+        extractTitleFromUrl(url) {
+          try {
+            const domain = new URL(url).hostname;
+            return (
+              domain.replace("www.", "").charAt(0).toUpperCase() +
+              domain.replace("www.", "").slice(1)
+            );
+          } catch {
+            return "Untitled";
+          }
+        }
+
+        async handleFileSelect(e) {
+          const files = Array.from(e.target.files);
+          if (files.length > 0) {
+            await this.processFiles(files);
+          }
+        }
+
+        async processFiles(files) {
+          this.showLoading();
+
+          try {
+            for (const file of files) {
+              if (file.size > 10 * 1024 * 1024) {
+                throw new Error(`File ${file.name} is too large (max 10MB)`);
+              }
+
+              const content = await this.readFile(file);
+              const bookmarks = await this.parseBookmarkFile(
+                content,
+                file.name
+              );
+              this.addBookmarks(bookmarks);
+            }
+
+            this.updateStats();
+            this.renderBookmarks();
+            this.showSuccess(
+              `Successfully imported bookmarks from ${files.length} file(s)`
+            );
+          } catch (error) {
+            this.showError(error.message);
+          } finally {
+            this.hideLoading();
+          }
+        }
+
+        readFile(file) {
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.onerror = () => reject(new Error("Failed to read file"));
+            reader.readAsText(file);
+          });
+        }
+
+        async parseBookmarkFile(content, filename) {
+          const extension = filename.toLowerCase().split(".").pop();
+
+          if (extension === "json") {
+            return this.parseJsonBookmarks(content);
+          } else if (extension === "html") {
+            return this.parseHtmlBookmarks(content);
+          } else {
+            throw new Error("Unsupported file format");
+          }
+        }
+
+        parseJsonBookmarks(content) {
+          try {
+            const data = JSON.parse(content);
+            return this.extractBookmarksFromJson(data);
+          } catch (error) {
+            throw new Error("Invalid JSON format");
+          }
+        }
+
+        parseHtmlBookmarks(content) {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(content, "text/html");
+          return this.extractBookmarksFromHtml(doc);
+        }
+
+        extractBookmarksFromJson(data, folder = "Imported") {
+          const bookmarks = [];
+
+          const traverse = (node, currentFolder) => {
+            if (Array.isArray(node)) {
+              node.forEach((item) => traverse(item, currentFolder));
+            } else if (typeof node === "object") {
+              if (node.type === "url" || node.url) {
+                bookmarks.push({
+                  title: node.title || node.name || "Untitled",
+                  url: node.url,
+                  folder: currentFolder,
+                  favicon: this.getFaviconUrl(node.url),
+                });
+              } else if (node.children || node.type === "folder") {
+                const folderName = node.title || node.name || "Untitled Folder";
+                if (node.children) {
+                  traverse(node.children, folderName);
+                }
+              } else {
+                Object.values(node).forEach((value) => {
+                  if (typeof value === "object") {
+                    traverse(value, currentFolder);
+                  }
+                });
+              }
+            }
+          };
+
+          traverse(data, folder);
+          return bookmarks;
+        }
+
+        extractBookmarksFromHtml(doc, folder = "Imported") {
+          const bookmarks = [];
+
+          const traverse = (element, currentFolder) => {
+            const links = element.querySelectorAll("a[href]");
+            links.forEach((link) => {
+              bookmarks.push({
+                title: link.textContent.trim() || "Untitled",
+                url: link.href,
+                folder: currentFolder,
+                favicon: this.getFaviconUrl(link.href),
+              });
+            });
+
+            const folders = element.querySelectorAll("h3, dt");
+            folders.forEach((folderElement) => {
+              const folderName =
+                folderElement.textContent.trim() || "Untitled Folder";
+              const nextElement = folderElement.nextElementSibling;
+              if (
+                nextElement &&
+                (nextElement.tagName === "DL" || nextElement.tagName === "UL")
+              ) {
+                traverse(nextElement, folderName);
+              }
+            });
+          };
+
+          traverse(doc.body || doc, folder);
+          return bookmarks;
+        }
+
+        getFaviconUrl(url) {
+          try {
+            const domain = new URL(url).hostname;
+            return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+          } catch {
+            return null;
+          }
+        }
+
+        addBookmarks(newBookmarks) {
+          this.bookmarks.push(...newBookmarks);
+          this.filteredBookmarks = [...this.bookmarks];
+        }
+
+        updateStats() {
+          const folders = [...new Set(this.bookmarks.map((b) => b.folder))];
+          this.totalBookmarks.textContent =
+            this.bookmarks.length.toLocaleString();
+          this.totalFolders.textContent = folders.length.toLocaleString();
+
+          const hasBookmarks = this.bookmarks.length > 0;
+          this.statsDisplay.style.display = hasBookmarks ? "flex" : "none";
+          this.searchCard.style.display = hasBookmarks ? "block" : "none";
+          this.bookmarksContainer.style.display = hasBookmarks
+            ? "block"
+            : "none";
+        }
+
+        handleSearch(e) {
+          const query = e.target.value.toLowerCase().trim();
+
+          if (query === "") {
+            this.filteredBookmarks = [...this.bookmarks];
+          } else {
+            this.filteredBookmarks = this.bookmarks.filter(
+              (bookmark) =>
+                bookmark.title.toLowerCase().includes(query) ||
+                bookmark.url.toLowerCase().includes(query) ||
+                bookmark.folder.toLowerCase().includes(query)
+            );
+          }
+
+          this.scrollTop = 0;
+          this.virtualList.scrollTop = 0;
+          this.renderBookmarks();
+        }
+
+        handleScroll() {
+          this.scrollTop = this.virtualList.scrollTop;
+          this.renderBookmarks();
+        }
+
+        renderBookmarks() {
+          if (this.filteredBookmarks.length === 0) {
+            this.showEmptyState();
+            return;
+          }
+
+          const startIndex = Math.floor(this.scrollTop / this.itemHeight);
+          const endIndex = Math.min(
+            startIndex + this.visibleItems,
+            this.filteredBookmarks.length
+          );
+
+          const containerHeight =
+            this.filteredBookmarks.length * this.itemHeight;
+          const offsetY = startIndex * this.itemHeight;
+
+          let html = `<div style="height: ${containerHeight}px; position: relative;">`;
+          html += `<div style="transform: translateY(${offsetY}px);">`;
+
+          for (let i = startIndex; i < endIndex; i++) {
+            const bookmark = this.filteredBookmarks[i];
+            html += this.renderBookmarkItem(bookmark);
+          }
+
+          html += "</div></div>";
+          this.virtualList.innerHTML = html;
+        }
+
+        renderBookmarkItem(bookmark) {
+          const favicon = bookmark.favicon
+            ? `<img src="${bookmark.favicon}" alt="" width="20" height="20" onerror="this.style.display='none'">`
+            : '<span class="material-icons" style="font-size: 20px;">public</span>';
+
+          return `
+                    <div class="bookmark-item d-flex align-items-center p-3" onclick="window.open('${this.escapeHtml(
+                      bookmark.url
+                    )}', '_blank')">
+                        <div class="me-3 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; background-color: #2d2d2d; border-radius: 8px;">
+                            ${favicon}
+                        </div>
+                        <div class="flex-grow-1 min-width-0 me-3">
+                            <div class="fw-medium text-truncate mb-1">${this.escapeHtml(
+                              bookmark.title
+                            )}</div>
+                            <div class="text-muted small text-truncate">${this.escapeHtml(
+                              bookmark.url
+                            )}</div>
+                        </div>
+                        <span class="badge text-bg-primary">${this.escapeHtml(
+                          bookmark.folder
+                        )}</span>
+                    </div>
+                `;
+        }
+
+        escapeHtml(text) {
+          const div = document.createElement("div");
+          div.textContent = text;
+          return div.innerHTML;
+        }
+
+        clearBookmarks() {
+          if (confirm("Are you sure you want to clear all bookmarks?")) {
+            this.bookmarks = [];
+            this.filteredBookmarks = [];
+            this.searchBox.value = "";
+            this.updateStats();
+            this.virtualList.innerHTML = "";
+            this.showSuccess("All bookmarks cleared");
+          }
+        }
+
+        showLoading() {
+          this.virtualList.innerHTML = `
+                    <div class="text-center p-5">
+                        <div class="spinner-border text-primary mb-3" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <div class="text-muted">Processing bookmark files...</div>
+                    </div>
+                `;
+          this.bookmarksContainer.style.display = "block";
+        }
+
+        hideLoading() {
+          // Loading will be replaced by actual content or empty state
+        }
+
+        showError(message) {
+          this.showToast(message, "danger");
+        }
+
+        showSuccess(message) {
+          this.showToast(message, "success");
+        }
+
+        showToast(message, type) {
+          const toast = document.createElement("div");
+          toast.className = `alert alert-${type} alert-dismissible position-fixed top-0 end-0 m-3`;
+          toast.style.zIndex = "1060";
+          toast.innerHTML = `
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+          document.body.appendChild(toast);
+
+          setTimeout(() => {
+            toast.remove();
+          }, 5000);
+        }
+
+        showEmptyState() {
+          this.virtualList.innerHTML = `
+                    <div class="text-center p-5 text-muted">
+                        <div class="material-icons mb-3" style="font-size: 4rem; opacity: 0.5;">bookmark_border</div>
+                        <div class="h5">No bookmarks found</div>
+                        <div class="opacity-75">Add bookmarks using the form above</div>
+                    </div>
+                `;
+        }
+      }
+
+      // Initialize the bookmark manager
+      document.addEventListener("DOMContentLoaded", () => {
+        new BookmarkManager();
+      });
+    </script>
+  </body>
+</html>
