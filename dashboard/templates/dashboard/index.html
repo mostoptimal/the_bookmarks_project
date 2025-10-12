@@ -5,7 +5,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bookmark Manager</title>
-    <link rel="icon" type="image/x-icon" href="{% static '/images/favico.ico' %}">
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="{% static '/images/favico.ico' %}"
+    />
     <link
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
       rel="stylesheet"
@@ -14,22 +18,40 @@
       href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet"
     />
-    <!--local styles-->
-    <link rel="stylesheet" href="{% static 'dashboard/css/styles.css' %}">
-
+    <link rel="stylesheet" href="{% static 'dashboard/css/styles.css' %}" />
   </head>
   <body>
     <div class="container">
-      <div class="header">
-        <h1>
-          <span
-            class="material-icons"
-            style="font-size: inherit; vertical-align: bottom"
-            >bookmarks</span
-          >
-          Bookmark Manager
-        </h1>
-        <p>Upload bookmark files or add individual bookmarks</p>
+      <!-- Feedback area for user messages -->
+      <div id="messageArea" aria-live="polite"></div>
+      <div
+        class="header"
+        role="banner"
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        "
+      >
+        <div>
+          <h1 style="display: inline">
+            <span
+              class="material-icons"
+              style="font-size: inherit; vertical-align: bottom"
+              >bookmarks</span
+            >
+            Bookmark Manager
+          </h1>
+          <p>Upload bookmark files or add individual bookmarks</p>
+        </div>
+        <button
+          class="settings-btn"
+          title="Settings"
+          aria-label="Settings"
+          style="background: none; border: none; cursor: pointer"
+        >
+          <span class="material-icons">settings</span>
+        </button>
       </div>
 
       <div class="input-methods">
@@ -39,7 +61,12 @@
             <span class="material-icons">cloud_upload</span>
             Upload Bookmark Files
           </div>
-          <div class="upload-area" id="uploadArea">
+          <div
+            class="upload-area"
+            id="uploadArea"
+            tabindex="0"
+            aria-label="Drag and drop area for bookmark file upload"
+          >
             <div class="material-icons upload-icon">upload_file</div>
             <div class="upload-text">Drop files here or click to browse</div>
             <div class="upload-subtext">
@@ -51,6 +78,7 @@
               id="fileInput"
               accept=".html,.json"
               multiple
+              aria-label="File picker for bookmarks (HTML, JSON)"
             />
           </div>
         </div>
@@ -61,7 +89,7 @@
             <span class="material-icons">add_link</span>
             Add Single Bookmark
           </div>
-          <form class="url-form" id="urlForm">
+          <form class="url-form" id="urlForm" role="form">
             <div class="form-group">
               <label class="form-label" for="urlInput">URL *</label>
               <input
@@ -70,6 +98,8 @@
                 class="form-input"
                 placeholder="https://example.com"
                 required
+                autocomplete="off"
+                aria-required="true"
               />
             </div>
             <div class="form-group">
@@ -79,6 +109,7 @@
                 id="titleInput"
                 class="form-input"
                 placeholder="Bookmark title (auto-detected if empty)"
+                autocomplete="off"
               />
             </div>
             <div class="form-group">
@@ -86,6 +117,18 @@
               <select id="folderSelect" class="select-input">
                 <option value="">Root</option>
               </select>
+              <!-- Placeholder for future folder management -->
+              <button
+                type="button"
+                class="btn btn-tertiary"
+                style="margin-left: 4px"
+                disabled
+                title="Manage folders (coming soon)"
+              >
+                <span class="material-icons" style="font-size: 18px"
+                  >create_new_folder</span
+                >
+              </button>
             </div>
             <div class="form-group">
               <label class="form-label" for="descriptionInput"
@@ -106,7 +149,13 @@
         </div>
       </div>
 
-      <div class="stats-bar" id="statsBar" style="display: none">
+      <div
+        class="stats-bar"
+        id="statsBar"
+        style="display: none"
+        role="region"
+        aria-label="Bookmark stats and controls"
+      >
         <div style="display: flex; gap: 24px; flex-wrap: wrap">
           <div class="stat-item">
             <span class="material-icons">bookmark</span>
@@ -125,10 +174,23 @@
             class="search-box"
             id="searchBox"
             placeholder="Search bookmarks..."
+            aria-label="Search bookmarks"
           />
-          <button class="btn btn-secondary" id="clearBtn">
+          <button
+            class="btn btn-secondary"
+            id="clearBtn"
+            aria-label="Clear all bookmarks"
+          >
             <span class="material-icons">clear</span>
             Clear All
+          </button>
+          <button
+            class="btn btn-secondary"
+            id="exportBtn"
+            aria-label="Export bookmarks"
+          >
+            <span class="material-icons">save_alt</span>
+            Export
           </button>
         </div>
       </div>
@@ -137,11 +199,21 @@
         class="bookmarks-container"
         id="bookmarksContainer"
         style="display: none"
+        role="region"
+        aria-label="Bookmarks list"
       >
-        <div class="virtual-list" id="virtualList"></div>
+        <div class="virtual-list" id="virtualList" role="list"></div>
       </div>
     </div>
-
     <script src="{% static 'dashboard/js/script.js' %}"></script>
+    <footer>
+      <p>
+        &copy;
+        <script>
+          document.write(new Date().getFullYear());
+        </script>
+        All Roghts Reserved, Mo
+      </p>
+    </footer>
   </body>
 </html>

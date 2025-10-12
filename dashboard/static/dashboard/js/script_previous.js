@@ -6,7 +6,6 @@ class BookmarkManager {
     this.itemHeight = 72;
     this.visibleItems = Math.ceil(600 / this.itemHeight) + 2;
     this.scrollTop = 0;
-    this.searchTimeout = null;
 
     this.initializeElements();
     this.bindEvents();
@@ -29,19 +28,6 @@ class BookmarkManager {
     this.clearBtn = document.getElementById("clearBtn");
     this.totalBookmarks = document.getElementById("totalBookmarks");
     this.totalFolders = document.getElementById("totalFolders");
-    this.messageArea =
-      document.getElementById("messageArea") || this.createMessageArea();
-    this.exportBtn = document.getElementById("exportBtn"); // might be null initially
-  }
-
-  createMessageArea() {
-    // If #messageArea doesn't exist, create it at top of container
-    const container = document.querySelector(".container");
-    const div = document.createElement("div");
-    div.id = "messageArea";
-    div.setAttribute("aria-live", "polite");
-    container.insertBefore(div, container.firstChild);
-    return div;
   }
 
   bindEvents() {
@@ -64,29 +50,14 @@ class BookmarkManager {
     this.urlForm.addEventListener("submit", this.handleAddBookmark.bind(this));
     this.urlInput.addEventListener("blur", this.autoFetchTitle.bind(this));
 
-    // Search (debounced)
-    this.searchBox.addEventListener(
-      "input",
-      this.debounce(this.handleSearch.bind(this), 250)
-    );
+    // Search
+    this.searchBox.addEventListener("input", this.handleSearch.bind(this));
 
     // Clear button
     this.clearBtn.addEventListener("click", this.clearBookmarks.bind(this));
 
     // Virtual scrolling
     this.virtualList.addEventListener("scroll", this.handleScroll.bind(this));
-
-    // Optional export button binding (if present)
-    if (this.exportBtn) {
-      this.exportBtn.addEventListener("click", this.exportBookmarks.bind(this));
-    }
-  }
-
-  debounce(func, wait) {
-    return (...args) => {
-      clearTimeout(this.searchTimeout);
-      this.searchTimeout = setTimeout(() => func.apply(this, args), wait);
-    };
   }
 
   async loadExistingBookmarks() {
@@ -99,15 +70,9 @@ class BookmarkManager {
         this.updateFolders();
         this.updateStats();
         this.renderBookmarks();
-      } else {
-        this.showMessage("Failed to load bookmarks from server.", "error");
       }
     } catch (error) {
       console.error("Failed to load existing bookmarks:", error);
-      this.showMessage(
-        "Error loading bookmarks. Please try again later.",
-        "error"
-      );
     }
   }
 
@@ -116,7 +81,7 @@ class BookmarkManager {
 
     const url = this.urlInput.value.trim();
     const title = this.titleInput.value.trim();
-    const folder = this.folderSelect.value || "Root";
+    const folder = this.folderSelect.value;
     const description = this.descriptionInput.value.trim();
 
     if (!url) {
@@ -132,7 +97,7 @@ class BookmarkManager {
       const bookmarkData = {
         url: url,
         title: title || (await this.fetchPageTitle(url)),
-        folder: folder,
+        folder: folder || "Root",
         description: description,
         favicon: this.getFaviconUrl(url),
       };
@@ -171,7 +136,8 @@ class BookmarkManager {
 
   async fetchPageTitle(url) {
     try {
-      // Backend title fetching endpoint logic should be here to avoid CORS. Fallback: extract domain.
+      // This would need a backend endpoint to fetch page title due to CORS
+      // For now, extract domain as fallback
       const domain = new URL(url).hostname;
       return domain.replace("www.", "");
     } catch {
@@ -189,9 +155,8 @@ class BookmarkManager {
       }
     });
 
+    // Update folder select
     const currentValue = this.folderSelect.value;
-
-    // Clear existing options
     this.folderSelect.innerHTML = '<option value="">Root</option>';
 
     Array.from(this.folders)
@@ -203,12 +168,7 @@ class BookmarkManager {
         this.folderSelect.appendChild(option);
       });
 
-    // Maintain previous selection if possible
-    if (Array.from(this.folders).includes(currentValue)) {
-      this.folderSelect.value = currentValue;
-    } else {
-      this.folderSelect.value = "";
-    }
+    this.folderSelect.value = currentValue;
   }
 
   async saveToDatabase(bookmarks) {
@@ -235,16 +195,16 @@ class BookmarkManager {
   }
 
   showMessage(message, type = "success") {
-    // Clear previous message
-    this.messageArea.textContent = "";
-    this.messageArea.className = "";
+    const messageDiv = document.createElement("div");
+    messageDiv.className = `${type}-message`;
+    messageDiv.textContent = message;
 
-    this.messageArea.classList.add(type + "-message");
-    this.messageArea.textContent = message;
+    // Insert after input methods
+    const inputMethods = document.querySelector(".input-methods");
+    inputMethods.after(messageDiv);
 
     setTimeout(() => {
-      this.messageArea.textContent = "";
-      this.messageArea.className = "";
+      messageDiv.remove();
     }, 5000);
   }
 
@@ -298,7 +258,7 @@ class BookmarkManager {
         "success"
       );
     } catch (error) {
-      this.showMessage(error.message, "error");
+      this.showError(error.message);
     } finally {
       this.hideLoading();
     }
@@ -329,7 +289,7 @@ class BookmarkManager {
     try {
       const data = JSON.parse(content);
       return this.extractBookmarksFromJson(data);
-    } catch {
+    } catch (error) {
       throw new Error("Invalid JSON format");
     }
   }
@@ -346,7 +306,7 @@ class BookmarkManager {
     const traverse = (node, currentFolder) => {
       if (Array.isArray(node)) {
         node.forEach((item) => traverse(item, currentFolder));
-      } else if (typeof node === "object" && node !== null) {
+      } else if (typeof node === "object") {
         if (node.type === "url" || node.url) {
           bookmarks.push({
             title: node.title || node.name || "Untitled",
@@ -361,7 +321,7 @@ class BookmarkManager {
           }
         } else {
           Object.values(node).forEach((value) => {
-            if (typeof value === "object" && value !== null) {
+            if (typeof value === "object") {
               traverse(value, currentFolder);
             }
           });
@@ -425,9 +385,9 @@ class BookmarkManager {
     this.totalBookmarks.textContent = this.bookmarks.length.toLocaleString();
     this.totalFolders.textContent = folders.length.toLocaleString();
 
-    const hasBookmarks = this.bookmarks.length > 0;
-    this.statsBar.style.display = hasBookmarks ? "flex" : "none";
-    this.bookmarksContainer.style.display = hasBookmarks ? "block" : "none";
+    this.statsBar.style.display = this.bookmarks.length > 0 ? "flex" : "none";
+    this.bookmarksContainer.style.display =
+      this.bookmarks.length > 0 ? "block" : "none";
   }
 
   handleSearch(e) {
@@ -487,22 +447,23 @@ class BookmarkManager {
       : '<span class="material-icons" style="font-size: 16px;">public</span>';
 
     return `
-      <div
-        class="bookmark-item"
-        tabindex="0"
-        role="listitem"
-        onclick="window.open('${this.escapeHtml(bookmark.url)}', '_blank')"
-        onkeydown="if(event.key==='Enter'){window.open('${this.escapeHtml(
-          bookmark.url
-        )}', '_blank')}"
-      >
-        <div class="bookmark-favicon">${favicon}</div>
-        <div class="bookmark-content">
-          <div class="bookmark-title">${this.escapeHtml(bookmark.title)}</div>
-          <div class="bookmark-url">${this.escapeHtml(bookmark.url)}</div>
-        </div>
-        <div class="bookmark-folder">${this.escapeHtml(bookmark.folder)}</div>
-      </div>`;
+                    <div class="bookmark-item" onclick="window.open('${this.escapeHtml(
+                      bookmark.url
+                    )}', '_blank')">
+                        <div class="bookmark-favicon">${favicon}</div>
+                        <div class="bookmark-content">
+                            <div class="bookmark-title">${this.escapeHtml(
+                              bookmark.title
+                            )}</div>
+                            <div class="bookmark-url">${this.escapeHtml(
+                              bookmark.url
+                            )}</div>
+                        </div>
+                        <div class="bookmark-folder">${this.escapeHtml(
+                          bookmark.folder
+                        )}</div>
+                    </div>
+                `;
   }
 
   escapeHtml(text) {
@@ -517,52 +478,65 @@ class BookmarkManager {
     this.searchBox.value = "";
     this.updateStats();
     this.virtualList.innerHTML = "";
-    this.showMessage("All bookmarks cleared.", "success");
   }
 
   showLoading() {
     this.virtualList.innerHTML = `
-      <div class="loading" role="alert" aria-busy="true">
-        <div class="spinner"></div>
-        <div>Processing bookmark files...</div>
-      </div>`;
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <div>Processing bookmark files...</div>
+                    </div>
+                `;
     this.bookmarksContainer.style.display = "block";
   }
 
   hideLoading() {
-    // No explicit action needed, renderBookmarks or error will override
+    // Loading will be replaced by actual content or empty state
+  }
+
+  showError(message) {
+    this.virtualList.innerHTML = `
+                    <div class="error-message">
+                        <strong>Error:</strong> ${this.escapeHtml(message)}
+                    </div>
+                `;
   }
 
   showEmptyState() {
     this.virtualList.innerHTML = `
-      <div class="empty-state" role="alert" aria-live="polite">
-        <div class="material-icons empty-icon" aria-hidden="true">bookmark_border</div>
-        <div>No bookmarks found</div>
-        <div style="margin-top: 8px; opacity: 0.7;">Upload bookmark files to get started</div>
-      </div>`;
+                    <div class="empty-state">
+                        <div class="material-icons empty-icon">bookmark_border</div>
+                        <div>No bookmarks found</div>
+                        <div style="margin-top: 8px; opacity: 0.7;">Upload bookmark files to get started</div>
+                    </div>
+                `;
   }
 
-  // Future feature: Export bookmarks as JSON file
-  exportBookmarks() {
-    if (!this.bookmarks.length) {
-      this.showMessage("No bookmarks to export.", "error");
-      return;
+  async saveToDatabase(bookmarks) {
+    try {
+      const response = await fetch("/bookmarks/upload/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ bookmarks: bookmarks }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert(result.message);
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      console.error("Save error:", error);
+      alert("Failed to save bookmarks: " + error.message);
     }
-    const dataStr = JSON.stringify(this.bookmarks, null, 2);
-    const blob = new Blob([dataStr], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "bookmarks_export.json";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    this.showMessage("Bookmarks exported successfully.", "success");
   }
 }
 
-// Initialize the bookmark manager on DOMContentLoaded
+// Initialize the bookmark manager
 document.addEventListener("DOMContentLoaded", () => {
   new BookmarkManager();
 });

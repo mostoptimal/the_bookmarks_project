@@ -434,3 +434,11 @@ body {
     text-align: center;
   }
 }
+
+footer{
+  display: flex;
+}
+
+footer p{
+  margin-left: 100px;
+}

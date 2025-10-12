@@ -1,3 +1,4 @@
+Directory Structure for: /home/mo/Documents/Project_of_projects/Python/bookmarks_organizer
 ============================================================
 
 bookmarks_organizer/
@@ -23,34 +24,38 @@ bookmarks_organizer/
 ├── bookmarks/
 │   ├── __pycache__/
 │   │   ├── __init__.cpython-313.pyc (184.0 B)
-│   │   ├── admin.cpython-313.pyc (228.0 B)
+│   │   ├── admin.cpython-313.pyc (1.5 KB)
 │   │   ├── apps.cpython-313.pyc (554.0 B)
-│   │   ├── models.cpython-313.pyc (225.0 B)
-│   │   ├── urls.cpython-313.pyc (373.0 B)
-│   │   └── views.cpython-313.pyc (439.0 B)
+│   │   ├── forms.cpython-313.pyc (1.7 KB)
+│   │   ├── models.cpython-313.pyc (3.9 KB)
+│   │   ├── urls.cpython-313.pyc (646.0 B)
+│   │   └── views.cpython-313.pyc (3.1 KB)
 │   ├── migrations/
 │   │   ├── __pycache__/
+│   │   │   ├── 0001_initial.cpython-313.pyc (3.8 KB)
 │   │   │   └── __init__.cpython-313.pyc (195.0 B)
+│   │   ├── 0001_initial.py (4.2 KB)
 │   │   └── __init__.py (0 B)
 │   ├── __init__.py (0 B)
-│   ├── admin.py (63.0 B)
+│   ├── admin.py (723.0 B)
 │   ├── apps.py (150.0 B)
-│   ├── models.py (57.0 B)
+│   ├── forms.py (589.0 B)
+│   ├── models.py (1.8 KB)
 │   ├── tests.py (60.0 B)
-│   ├── urls.py (156.0 B)
-│   └── views.py (189.0 B)
+│   ├── urls.py (375.0 B)
+│   └── views.py (2.7 KB)
 ├── bookmarks_organizer/
 │   ├── __pycache__/
 │   │   ├── __init__.cpython-313.pyc (194.0 B)
-│   │   ├── settings.cpython-313.pyc (2.6 KB)
-│   │   ├── urls.cpython-313.pyc (1.2 KB)
+│   │   ├── settings.cpython-313.pyc (2.8 KB)
+│   │   ├── urls.cpython-313.pyc (1.5 KB)
 │   │   └── wsgi.cpython-313.pyc (706.0 B)
 │   ├── static/
 │   │   └── favico.ico (8.5 KB)
 │   ├── __init__.py (0 B)
 │   ├── asgi.py (415.0 B)
-│   ├── settings.py (3.5 KB)
-│   ├── urls.py (999.0 B)
+│   ├── settings.py (3.7 KB)
+│   ├── urls.py (1.1 KB)
 │   └── wsgi.py (415.0 B)
 ├── dashboard/
 │   ├── __pycache__/
@@ -64,13 +69,20 @@ bookmarks_organizer/
 │   │   ├── __pycache__/
 │   │   │   └── __init__.cpython-313.pyc (195.0 B)
 │   │   └── __init__.py (0 B)
+│   ├── static/
+│   │   └── dashboard/
+│   │       ├── css/
+│   │       │   └── styles.css (7.3 KB)
+│   │       └── js/
+│   │           ├── script.js (16.6 KB)
+│   │           └── script_previous.js (15.6 KB)
 │   ├── templates/
 │   │   └── dashboard/
-│   │       ├── index.html (31.7 KB)
+│   │       ├── index.best.html (22.9 KB)
+│   │       ├── index.html (6.7 KB)
 │   │       ├── index.v1.html (570.0 B)
 │   │       ├── index.v2.html (22.4 KB)
-│   │       ├── index.v3.html (21.5 KB)
-│   │       └── prompt_dashboard.md (3.3 KB)
+│   │       └── index.v3.html (21.5 KB)
 │   ├── __init__.py (0 B)
 │   ├── admin.py (63.0 B)
 │   ├── apps.py (150.0 B)
@@ -106,9 +118,12 @@ bookmarks_organizer/
 │   ├── tests.py (60.0 B)
 │   ├── urls.py (183.0 B)
 │   └── views.py (106.0 B)
-├── bookmark_manager_structure.txt (0 B)
-├── db.sqlite3 (204.0 KB)
+├── Readme.md (14.0 B)
+├── bookmark_manager_structure.txt (4.4 KB)
+├── db.sqlite3 (832.0 KB)
+├── directory_structure.txt (0 B)
 ├── manage.py (675.0 B)
 └── scan.py (4.8 KB)
 
 ============================================================
+Scan completed successfully!
